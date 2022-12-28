@@ -94,6 +94,20 @@ class Espressif32Platform(PlatformBase):
                     self.packages[p]["optional"] = False
                 elif p in ("tool-mconf", "tool-idf") and IS_WINDOWS:
                     self.packages[p]["optional"] = False
+        
+        if "zephyr" in variables.get("pioframework", []):
+            for p in self.packages:
+                if p in ("tool-cmake", "tool-dtc","tool-ninja", "toolchain-%sulp" % mcu, "framework-espidf"):
+                    self.packages[p]["optional"] = False
+                elif p in ("tool-mconf", "tool-idf") and IS_WINDOWS:
+                    self.packages[p]["optional"] = False
+                    self.packages["tool-gperf"]["optional"] = False
+            self.packages["toolchain-xtensa32"] = {
+                "type": "toolchain",
+                "owner": "platformio",
+                "version": "~2.50200.0"
+            }
+                    
 
         for available_mcu in ("esp32", "esp32s2", "esp32s3"):
             if available_mcu == mcu:

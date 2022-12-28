@@ -30,6 +30,13 @@
       "description": "ESP-IDF is the official development framework for the ESP32 and ESP32-S Series SoCs.",
       "homepage": "https://docs.espressif.com/projects/esp-idf/en/latest/esp32/",
       "title": "Espressif IoT Development Framework"
+    },
+    "zephyr": {
+      "package": "framework-zephyr",
+      "script": "builder/frameworks/zephyr.py",
+      "description": "The Zephyr Project is a scalable real-time operating system (RTOS) supporting multiple hardware architectures, optimized for resource constrained devices, and built with safety and security in mind",
+      "homepage": "https://www.zephyrproject.org",
+      "title": "Zephyr RTOS"
     }
   },
   "packages": {
@@ -129,6 +136,16 @@
       "optional": true,
       "owner": "platformio",
       "version": "^1.7.0"
+    },
+    "tool-gperf": {
+      "optional": true,
+      "owner": "platformio",
+      "version": "^3.0.0"
+    },
+    "tool-dtc": {
+      "optional": true,
+      "owner": "platformio",
+      "version": "~1.4.7"
     },
     "tool-mconf": {
       "optional": true,

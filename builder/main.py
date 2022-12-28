@@ -292,8 +292,14 @@ env.Append(
         ),
     )
 )
-
-if not env.get("PIOFRAMEWORK"):
+#
+if "zephyr" in env.get("PIOFRAMEWORK", []):
+    env.SConscript(
+        join(platform.get_package_dir(
+            "framework-zephyr"), "scripts", "platformio", "platformio-build-pre.py"),
+        exports={"env": env}
+    )
+elif not env.get("PIOFRAMEWORK"):
     env.SConscript("frameworks/_bare.py", exports="env")
 
 #
@@ -310,16 +316,22 @@ if "nobuild" in COMMAND_LINE_TARGETS:
         target_firm = join("$BUILD_DIR", "${PROGNAME}.bin")
 else:
     target_elf = env.BuildProgram()
-    if set(["buildfs", "uploadfs", "uploadfsota"]) & set(COMMAND_LINE_TARGETS):
-        target_firm = env.DataToBin(
-            join("$BUILD_DIR", "${ESP32_FS_IMAGE_NAME}"), "$PROJECT_DATA_DIR"
-        )
-        env.NoCache(target_firm)
-        AlwaysBuild(target_firm)
+    print(f'using zephyr elf conversion')
+    if str(target_elf[0]).endswith("zephyr.elf"):
+        target_firm = str(target_elf[0]).replace(".elf", ".bin")
+        print(f'target_firm = {target_firm}')
+        env.Depends(target_firm, target_elf)
     else:
-        target_firm = env.ElfToBin(
-            join("$BUILD_DIR", "${PROGNAME}"), target_elf)
-        env.Depends(target_firm, "checkprogsize")
+        if set(["buildfs", "uploadfs", "uploadfsota"]) & set(COMMAND_LINE_TARGETS):
+            target_firm = env.DataToBin(
+                join("$BUILD_DIR", "${ESP32_FS_IMAGE_NAME}"), "$PROJECT_DATA_DIR"
+            )
+            env.NoCache(target_firm)
+            AlwaysBuild(target_firm)
+        else:
+            target_firm = env.ElfToBin(
+                join("$BUILD_DIR", "${PROGNAME}"), target_elf)
+            env.Depends(target_firm, "checkprogsize")
 
 env.AddPlatformTarget("buildfs", target_firm, target_firm, "Build Filesystem Image")
 AlwaysBuild(env.Alias("nobuild", target_firm))
